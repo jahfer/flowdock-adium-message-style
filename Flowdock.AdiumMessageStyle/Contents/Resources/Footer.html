@@ -1,3 +1,5 @@
+<!-- FILES MODIFIED BY @JAHFER -->
+
 <script language="Javascript" src="lib/jquery.min.js"></script>
 <script type="text/javascript" defer="defer">
 
@@ -10,6 +12,7 @@ function scrubHTML(html) {
   html = html.replace(/"<a href="https?:\/\/.+?" title="https?:\/\/.+?">(https?:\/\/.+?)<\/a>"/g, '"$1"');
   // strip targets
   html = html.replace(/target="_blank"/g, '');
+  html = html.replace(/\(notice\) \[(.*)\]/, '$1: ');
   return html
 }
 
@@ -20,8 +23,10 @@ function hipChatizeHTML(html) {
 
   // scrub the raw message
   rawMessage = scrubHTML(rawMessage);
+  // style replies (this probably won't work)
+  var tmp = rawMessage.replace(/(\[.*\] <<) (.*)/, '<span class="reply"><span class="origMessage">$1</span>$2</span>')
   // add style to @ mentions
-  messageNode.innerHTML = rawMessage.replace(/(@"*[\d\w]*)/, '<span class="atTag">$1</span>');
+  messageNode.innerHTML = tmp.replace(/(@"*[\d\w]*)/gi, '<span class="atTag">$1</span>');
 
   var senderNode = html.querySelector('#sender');
 
@@ -39,20 +44,26 @@ function hipChatizeHTML(html) {
     senderNode.innerText = truncatedSender;
 
     // Colorize the message
-    if(/github|(chef\sclient)/gi.test(rawSender)) {
-      messageClass = "systemMessage";
-    } else if(/You have connected/gi.test(rawMessage)) {
-      newContent = document.createTextNode('Welcome!');
-      senderNode.appendChild(newContent);
-      messageClass = "welcomeMessage";
-    } else if(/jenkins/gi.test(rawSender)) {
+    if(/flowdock/gi.test(rawSender) && /failed branch/gi.test(rawMessage)) {
       if(/failed/gi.test(rawMessage)) {
         messageClass = "systemMessage red";
       } else {
         messageClass = "systemMessage green";
       }
-    } else {
+    } else if (/spy/gi.test(rawSender) && /exception in/gi.test(rawMessage)) {
+      messageClass = "systemMessage red";
+    } else if(/flowdock|spy/gi.test(rawSender)) {
+      messageClass = "systemMessage";
+    } else if(/You have connected/gi.test(rawMessage)) {
+      newContent = document.createTextNode('Welcome!');
+      senderNode.appendChild(newContent);
+      messageClass = "welcomeMessage";
+    } else  {
       messageClass = "";
+    }
+
+    if (/(\w+ = \w+)|(def \w+)|(var \w+)|(@\w+\.)/gi.test(rawMessage)) {
+      $(html.firstChild).addClass('codeBlock');
     }
 
     $(html.firstChild).addClass(messageClass);

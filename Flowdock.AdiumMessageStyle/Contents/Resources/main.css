@@ -1,3 +1,5 @@
+/* FILES MODIFIED BY @JAHFER */
+
 * {
 font-family:"Lucida Grande",arial,sans-serif;
 font-size:12px;
@@ -72,6 +74,10 @@ margin:5px 10px 0;
 .chatBlock
 td {
 padding:3px 0;
+}
+
+.codeBlock {
+  font-family: "Meslo LG M", monospace;
 }
 
 .linkBlock
@@ -399,6 +405,13 @@ p.monospace, .messageBlock p.monospace
 *, .messageBlock pre
 * {
 font-family:monospace;
+}
+
+.origMessage {
+  font-style: italic;
+  display: block;
+  color: #666;
+  font-size: 11px !important;
 }
 
 /* MESSAGE STYLE COMPAT */
